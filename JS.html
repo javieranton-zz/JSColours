@@ -1,0 +1,83 @@
+<html>
+<head>
+<title>Change Colours</title>
+
+<script type="text/javascript" src="jquery-3.2.1.min.js"></script>
+
+</head>
+
+<body>
+
+<h1>Change Colours</h1>
+<div id="msg">I’d like to color a paragraph of text into random colors (not ordered in a particular way). List of colors needs to be entered by the user with appropriate input validation and stored in array. Two neighboring letters should not have the same color. </div>
+<div id="invMsg" style="visibility:hidden">I’d like to color a paragraph of text into random colors (not ordered in a particular way). List of colors needs to be entered by the user with appropriate input validation and stored in array. Two neighboring letters should not have the same color. </div>
+<div id="errorMsg" style="color:red"></div>
+<div style="padding:16px;">
+<input type="textbox" id="txt_colours" value="Red, Orange; Yellow, Green, Blue "></input>
+</div>
+
+<button id="Get" onclick="applyColor()">Apply colors to text</button>
+
+<script type="text/javascript">
+	function applyColor() {
+		$('#errorMsg').empty();
+		//Get colors textbox values
+		var colours = $('#txt_colours').val();
+		//Separate by comma
+		var comaSeparatedArray = colours.split(',');
+		var finalColorArray = [];
+		//Further divide by semicolon and sort in final array
+		$.each(comaSeparatedArray, function( index, value ) {
+			var subArray = value.split(';');
+			$.each(subArray, function( index2, value2 ) {
+				finalColorArray.push(value2.trim());
+			});
+		});
+		//Color Validation
+		var colorsValidated = true;
+		if(finalColorArray.length < 2) {
+			$('#errorMsg').text("Must type at least 2 colors");
+			colorsValidated = false;
+		}
+		else
+			$.each(finalColorArray, function( index, value ) {
+				if(!validTextColour(value))
+				{
+					$('#errorMsg').text("Invalid color name detected:" + value);
+					colorsValidated = false;
+				}
+			});	
+		//Write text
+		if(colorsValidated)
+		{
+			var lettersArray = $('#invMsg').text().split('');
+			$('#msg').empty();
+			var previousColor="";
+			$.each(lettersArray, function( index, value ) {
+				var randomColour = finalColorArray[Math.floor(Math.random() * finalColorArray.length)];
+				while(previousColor == randomColour)
+					randomColour = finalColorArray[Math.floor(Math.random() * finalColorArray.length)];
+				previousColor = randomColour;
+				$('#msg').append("<span style='color:" + randomColour + "'>" + value + "</span>");
+			});
+		}
+		
+	}
+	function validTextColour(stringToTest) {
+    if (stringToTest === "") { return false; }
+    if (stringToTest === "inherit") { return false; }
+    if (stringToTest === "transparent") { return false; }
+
+    var image = document.createElement("img");
+    image.style.color = "rgb(0, 0, 0)";
+    image.style.color = stringToTest;
+    if (image.style.color !== "rgb(0, 0, 0)") { return true; }
+    image.style.color = "rgb(255, 255, 255)";
+    image.style.color = stringToTest;
+    return image.style.color !== "rgb(255, 255, 255)";
+	}
+
+</script>
+
+</body>
+</html>
